@@ -1,152 +1,529 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
-import { ApexOptions } from "apexcharts";
-import dynamic from "next/dynamic";
-import { MoreDotIcon } from "@/icons";
-import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { useState } from "react";
-import { Dropdown } from "../ui/dropdown/Dropdown";
 
-// Dynamically import the ReactApexChart component
-const ReactApexChart = dynamic(() => import("react-apexcharts"), {
-  ssr: false,
-});
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
+type ChartItem = {
+  name: string;
+  total: number;
+};
+
+type TransactionItem = {
+  outlet: string;
+  pajak: number;
+  total: number;
+};
 
 export default function MonthlySalesChart() {
-  const options: ApexOptions = {
-    colors: ["#465fff"],
-    chart: {
-      fontFamily: "Outfit, sans-serif",
-      type: "bar",
-      height: 180,
-      toolbar: {
-        show: false,
-      },
-    },
-    plotOptions: {
-      bar: {
-        horizontal: false,
-        columnWidth: "39%",
-        borderRadius: 5,
-        borderRadiusApplication: "end",
-      },
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    stroke: {
-      show: true,
-      width: 4,
-      colors: ["transparent"],
-    },
-    xaxis: {
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ],
-      axisBorder: {
-        show: false,
-      },
-      axisTicks: {
-        show: false,
-      },
-    },
-    legend: {
-      show: true,
-      position: "top",
-      horizontalAlign: "left",
-      fontFamily: "Outfit",
-    },
-    yaxis: {
-      title: {
-        text: undefined,
-      },
-    },
-    grid: {
-      yaxis: {
-        lines: {
-          show: true,
-        },
-      },
-    },
-    fill: {
-      opacity: 1,
-    },
 
-    tooltip: {
-      x: {
-        show: false,
-      },
-      y: {
-        formatter: (val: number) => `${val}`,
-      },
-    },
+  const [activeTab, setActiveTab] =
+    useState("transaksi");
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [transaksiData, setTransaksiData] =
+    useState<ChartItem[]>([]);
+
+  const [pajakData, setPajakData] =
+    useState<ChartItem[]>([]);
+
+  const [transactions, setTransactions] =
+    useState<TransactionItem[]>([]);
+
+  const [search, setSearch] =
+    useState("");
+
+  // =========================
+  // PAGINATION
+  // =========================
+  const [pageSize, setPageSize] =
+    useState(5);
+
+  const [currentPage, setCurrentPage] =
+    useState(1);
+
+  // =====================================
+  // LOAD API
+  // =====================================
+  useEffect(() => {
+
+    const loadData = async () => {
+
+      try {
+
+        // =========================
+        // TOP TRANSAKSI
+        // =========================
+        const transaksiRes = await fetch(
+          "http://localhost:8080/api/dashboard/top-transaksi",
+          {
+            cache: "no-store",
+             credentials: "include",
+          }
+        );
+
+        const transaksiJson =
+          await transaksiRes.json();
+
+        setTransaksiData(transaksiJson);
+
+        // =========================
+        // TOP PAJAK
+        // =========================
+        const pajakRes = await fetch(
+          "http://localhost:8080/api/dashboard/top-pajak",
+          {
+            cache: "no-store",
+             credentials: "include",
+          }
+        );
+
+        const pajakJson =
+          await pajakRes.json();
+
+        setPajakData(pajakJson);
+
+        // =========================
+        // LAST TRANSACTIONS
+        // =========================
+        const lastRes = await fetch(
+          "http://localhost:8080/api/dashboard/last-transactions",
+          {
+            cache: "no-store",
+             credentials: "include",
+          }
+        );
+
+        const lastJson =
+          await lastRes.json();
+
+        setTransactions(lastJson);
+
+      } catch (error) {
+
+        console.error(error);
+
+      } finally {
+
+        setLoading(false);
+
+      }
+    };
+
+    loadData();
+
+  }, []);
+
+  // =====================================
+  // CURRENT DATA
+  // =====================================
+  const currentData =
+    activeTab === "transaksi"
+      ? transaksiData
+      : pajakData;
+
+  // =====================================
+  // MAX VALUE
+  // =====================================
+  const maxValue =
+    currentData.length > 0
+      ? Math.max(
+          ...currentData.map(
+            (item) => item.total
+          )
+        )
+      : 0;
+
+  // =====================================
+  // FORMAT NUMBER
+  // =====================================
+  const formatNumber = (
+    number: number
+  ) => {
+
+    return new Intl.NumberFormat(
+      "id-ID"
+    ).format(number);
   };
-  const series = [
-    {
-      name: "Sales",
-      data: [168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112],
-    },
-  ];
-  const [isOpen, setIsOpen] = useState(false);
 
-  function toggleDropdown() {
-    setIsOpen(!isOpen);
-  }
+  // =====================================
+  // FILTERED TRANSACTIONS
+  // =====================================
+  const filteredTransactions =
+    useMemo(() => {
 
-  function closeDropdown() {
-    setIsOpen(false);
+      return transactions.filter(
+        (item) =>
+          item.outlet
+            .toLowerCase()
+            .includes(
+              search.toLowerCase()
+            )
+      );
+
+    }, [transactions, search]);
+
+  // =====================================
+  // TOTAL PAGE
+  // =====================================
+  const totalPages =
+    Math.ceil(
+      filteredTransactions.length /
+        pageSize
+    );
+
+  // =====================================
+  // PAGINATED DATA
+  // =====================================
+  const paginatedTransactions =
+    useMemo(() => {
+
+      const start =
+        (currentPage - 1) *
+        pageSize;
+
+      const end =
+        start + pageSize;
+
+      return filteredTransactions.slice(
+        start,
+        end
+      );
+
+    }, [
+      filteredTransactions,
+      currentPage,
+      pageSize,
+    ]);
+
+  // =====================================
+  // RESET PAGE SAAT SEARCH
+  // =====================================
+  useEffect(() => {
+
+    setCurrentPage(1);
+
+  }, [search, pageSize]);
+
+  if (loading) {
+    return (
+      <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+        <p className="text-sm text-gray-500">
+          Loading dashboard...
+        </p>
+      </div>
+    );
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-          Monthly Sales
-        </h3>
+    <div className="space-y-6">
 
-        <div className="relative inline-block">
-          <button onClick={toggleDropdown} className="dropdown-toggle">
-            <MoreDotIcon className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" />
-          </button>
-          <Dropdown
-            isOpen={isOpen}
-            onClose={closeDropdown}
-            className="w-40 p-2"
+      {/* ========================= */}
+      {/* CARD 1 */}
+      {/* ========================= */}
+      <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+
+        <h2 className="text-base font-medium text-gray-700">
+          5 Besar Retribusi Objek Pajak
+        </h2>
+
+        {/* Tabs */}
+        <div className="mt-6 flex border-b border-gray-200">
+
+          <button
+            onClick={() =>
+              setActiveTab(
+                "transaksi"
+              )
+            }
+            className={`px-3 pb-3 text-sm font-semibold transition ${
+              activeTab ===
+              "transaksi"
+                ? "border-b-2 border-blue-500 text-blue-700"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
           >
-            <DropdownItem
-              onItemClick={closeDropdown}
-              className="flex w-full font-normal text-left text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
-            >
-              View More
-            </DropdownItem>
-            <DropdownItem
-              onItemClick={closeDropdown}
-              className="flex w-full font-normal text-left text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
-            >
-              Delete
-            </DropdownItem>
-          </Dropdown>
+            TRANSAKSI
+          </button>
+
+          <button
+            onClick={() =>
+              setActiveTab(
+                "pajak"
+              )
+            }
+            className={`ml-4 px-3 pb-3 text-sm font-semibold transition ${
+              activeTab === "pajak"
+                ? "border-b-2 border-blue-500 text-blue-700"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            PAJAK
+          </button>
+
+        </div>
+
+        {/* Content */}
+        <div className="mt-4 border border-gray-200 p-4">
+
+          {currentData.map(
+            (item, index) => {
+
+              const percentage =
+                maxValue > 0
+                  ? (item.total /
+                      maxValue) *
+                    100
+                  : 0;
+
+              return (
+                <div
+                  key={index}
+                  className="mb-5 last:mb-0"
+                >
+
+                  <div className="mb-2 flex items-center justify-between gap-3">
+
+                    <p className="text-sm text-gray-700">
+                      {index + 1}.{" "}
+                      {item.name}
+                    </p>
+
+                    <p className="text-sm whitespace-nowrap text-gray-700">
+                      {formatNumber(
+                        item.total
+                      )}
+                    </p>
+
+                  </div>
+
+                  <div className="h-2 w-full rounded-full bg-gray-100">
+
+                    <div
+                      className="h-2 rounded-full bg-purple-400 transition-all duration-500"
+                      style={{
+                        width: `${percentage}%`,
+                      }}
+                    />
+
+                  </div>
+                </div>
+              );
+            }
+          )}
+
         </div>
       </div>
 
-      <div className="max-w-full overflow-x-auto custom-scrollbar">
-        <div className="-ml-5 min-w-[650px] xl:min-w-full pl-2">
-          <ReactApexChart
-            options={options}
-            series={series}
-            type="bar"
-            height={180}
-          />
+      {/* ========================= */}
+      {/* CARD 2 */}
+      {/* ========================= */}
+      <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+
+        {/* Header */}
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+
+          <h3 className="text-base font-medium text-gray-700">
+            100 Transaksi Terakhir
+          </h3>
+
+          <div className="relative w-full md:w-80">
+
+            <input
+              type="text"
+              placeholder="Cari transaksi..."
+              value={search}
+              onChange={(e) =>
+                setSearch(
+                  e.target.value
+                )
+              }
+              className="h-10 w-full rounded-md border border-gray-300 pl-4 pr-10 text-sm outline-none focus:border-blue-500"
+            />
+
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="mt-6 overflow-x-auto">
+
+          <table className="w-full">
+
+            <thead>
+
+              <tr className="border-b border-gray-200 text-left">
+
+                <th className="pb-4 text-sm font-medium text-gray-500">
+                  Outlet
+                </th>
+
+                <th className="pb-4 text-sm font-medium text-gray-500">
+                  Pajak
+                </th>
+
+                <th className="pb-4 text-sm font-medium text-gray-500">
+                  Total
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              {paginatedTransactions.map(
+                (
+                  item,
+                  index
+                ) => (
+                  <tr
+                    key={index}
+                    className="border-b border-gray-100"
+                  >
+
+                    <td className="py-4 text-sm text-gray-800">
+                      {
+                        item.outlet
+                      }
+                    </td>
+
+                    <td className="py-4 text-sm text-gray-800">
+                      {formatNumber(
+                        item.pajak
+                      )}
+                    </td>
+
+                    <td className="py-4 text-sm text-gray-800">
+                      {formatNumber(
+                        item.total
+                      )}
+                    </td>
+
+                  </tr>
+                )
+              )}
+
+            </tbody>
+
+          </table>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between text-sm text-gray-500">
+
+          {/* Left */}
+          <div className="flex items-center gap-2">
+
+            <span>
+              Baris per halaman
+            </span>
+
+            <select
+              value={pageSize}
+              onChange={(e) =>
+                setPageSize(
+                  Number(
+                    e.target.value
+                  )
+                )
+              }
+              className="rounded border border-gray-200 px-2 py-1 outline-none"
+            >
+              <option value={5}>
+                5
+              </option>
+
+              <option value={10}>
+                10
+              </option>
+
+              <option value={25}>
+                25
+              </option>
+
+            </select>
+
+          </div>
+
+          {/* Center */}
+          <div>
+
+            {filteredTransactions.length === 0
+              ? "0"
+              : `${
+                  (currentPage - 1) *
+                    pageSize +
+                  1
+                }-${Math.min(
+                  currentPage *
+                    pageSize,
+                  filteredTransactions.length
+                )}`}
+
+            {" "}of{" "}
+
+            {
+              filteredTransactions.length
+            }
+
+          </div>
+
+          {/* Right */}
+          <div className="flex items-center gap-2">
+
+            <button
+              disabled={
+                currentPage === 1
+              }
+              onClick={() =>
+                setCurrentPage(
+                  (prev) =>
+                    prev - 1
+                )
+              }
+              className={`rounded px-3 py-1 ${
+                currentPage === 1
+                  ? "cursor-not-allowed bg-gray-100 text-gray-300"
+                  : "bg-gray-200 hover:bg-gray-300"
+              }`}
+            >
+              ‹
+            </button>
+
+            <div className="px-2">
+
+              Page {currentPage} /{" "}
+              {totalPages || 1}
+
+            </div>
+
+            <button
+              disabled={
+                currentPage >=
+                totalPages
+              }
+              onClick={() =>
+                setCurrentPage(
+                  (prev) =>
+                    prev + 1
+                )
+              }
+              className={`rounded px-3 py-1 ${
+                currentPage >=
+                totalPages
+                  ? "cursor-not-allowed bg-gray-100 text-gray-300"
+                  : "bg-gray-200 hover:bg-gray-300"
+              }`}
+            >
+              ›
+            </button>
+
+          </div>
         </div>
       </div>
     </div>

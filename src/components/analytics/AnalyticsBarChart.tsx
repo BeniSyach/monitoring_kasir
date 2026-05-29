@@ -119,7 +119,7 @@ export default function AnalyticsBarChart() {
       <div className="flex flex-wrap items-start justify-between gap-5">
         <div>
           <h3 className="mb-1 text-lg font-semibold text-gray-800 dark:text-white/90">
-            Analytics
+           Transaksi Periode 2026-05-01 s/d. 2026-05-31
           </h3>
           <span className="block text-gray-500 text-theme-sm dark:text-gray-400">
             Visitor analytics of last 30 days

@@ -1,123 +1,250 @@
-import React from "react";
-// import { VectorMap } from "@react-jvectormap/core";
-import { worldMill } from "@react-jvectormap/world";
-import dynamic from "next/dynamic";
+"use client";
 
-const VectorMap = dynamic(
-  () => import("@react-jvectormap/core").then((mod) => mod.VectorMap),
-  { ssr: false }
-);
+import "leaflet/dist/leaflet.css";
 
-// Define the component props
-interface CountryMapProps {
-  mapColor?: string;
+import {
+  MapContainer,
+  TileLayer,
+  Popup,
+  CircleMarker,
+  GeoJSON,
+} from "react-leaflet";
+
+import L from "leaflet";
+
+import {
+  useEffect,
+  useState,
+} from "react";
+
+// =========================
+// FIX LEAFLET ICON
+// =========================
+interface DefaultIconPrototype {
+  _getIconUrl?: string;
 }
 
-type MarkerStyle = {
-  initial: {
-    fill: string;
-    r: number; // Radius for markers
-  };
-};
+delete (
+  L.Icon.Default.prototype as DefaultIconPrototype
+)._getIconUrl;
 
-type Marker = {
-  latLng: [number, number];
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+
+  iconUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+
+  shadowUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+});
+
+// =========================
+// TYPE
+// =========================
+type StoreLocation = {
+  id: number;
   name: string;
-  style?: {
-    fill: string;
-    borderWidth: number;
-    borderColor: string;
-    stroke?: string;
-    strokeOpacity?: number;
-  };
+  latitude: number;
+  longitude: number;
+  operationalStatus: string;
 };
 
-const CountryMap: React.FC<CountryMapProps> = ({ mapColor }) => {
+// =========================
+// COMPONENT
+// =========================
+export default function CountryMap() {
+
+  const [geoData, setGeoData] =
+    useState(null);
+
+  const [locations, setLocations] =
+    useState<StoreLocation[]>([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  // =========================
+  // LOAD GEOJSON
+  // =========================
+  useEffect(() => {
+
+    fetch("/maps/deli-serdang.geojson")
+      .then((res) => res.json())
+      .then((data) => {
+        setGeoData(data);
+      });
+
+  }, []);
+
+  // =========================
+  // LOAD STORE LOCATION
+  // =========================
+  useEffect(() => {
+
+    const loadStores = async () => {
+
+      try {
+
+        const response = await fetch(
+          "http://localhost:8080/api/stores",
+          {
+            cache: "no-store",
+            credentials: "include",
+          }
+        );
+
+        const data =
+          await response.json();
+
+        // FILTER YANG PUNYA KOORDINAT
+        const filtered =
+          data.filter(
+            (item: StoreLocation) =>
+              item.latitude &&
+              item.longitude
+          );
+
+        setLocations(filtered);
+
+      } catch (error) {
+
+        console.error(error);
+
+      } finally {
+
+        setLoading(false);
+
+      }
+    };
+
+    loadStores();
+
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex h-full items-center justify-center rounded-xl border border-gray-200 bg-white">
+        <p className="text-sm text-gray-500">
+          Loading maps...
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <VectorMap
-      map={worldMill}
-      backgroundColor="transparent"
-      markerStyle={
-        {
-          initial: {
-            fill: "#465FFF",
-            r: 4, // Custom radius for markers
-          }, // Type assertion to bypass strict CSS property checks
-        } as MarkerStyle
-      }
-      markersSelectable={true}
-      markers={
-        [
-          {
-            latLng: [37.2580397, -104.657039],
-            name: "United States",
-            style: {
-              fill: "#465FFF",
-              borderWidth: 1,
-              borderColor: "white",
-              stroke: "#383f47",
-            },
-          },
-          {
-            latLng: [20.7504374, 73.7276105],
-            name: "India",
-            style: { fill: "#465FFF", borderWidth: 1, borderColor: "white" },
-          },
-          {
-            latLng: [53.613, -11.6368],
-            name: "United Kingdom",
-            style: { fill: "#465FFF", borderWidth: 1, borderColor: "white" },
-          },
-          {
-            latLng: [-25.0304388, 115.2092761],
-            name: "Sweden",
-            style: {
-              fill: "#465FFF",
-              borderWidth: 1,
-              borderColor: "white",
-              strokeOpacity: 0,
-            },
-          },
-        ] as Marker[]
-      }
-      zoomOnScroll={false}
-      zoomMax={12}
-      zoomMin={1}
-      zoomAnimate={true}
-      zoomStep={1.5}
-      regionStyle={{
-        initial: {
-          fill: mapColor || "#D0D5DD",
-          fillOpacity: 1,
-          fontFamily: "Outfit",
-          stroke: "none",
-          strokeWidth: 0,
-          strokeOpacity: 0,
-        },
-        hover: {
-          fillOpacity: 0.7,
-          cursor: "pointer",
-          fill: "#465fff",
-          stroke: "none",
-        },
-        selected: {
-          fill: "#465FFF",
-        },
-        selectedHover: {},
-      }}
-      regionLabelStyle={{
-        initial: {
-          fill: "#35373e",
-          fontWeight: 500,
-          fontSize: "13px",
-          stroke: "none",
-        },
-        hover: {},
-        selected: {},
-        selectedHover: {},
-      }}
-    />
-  );
-};
+    <MapContainer
+      center={[3.548, 98.82]}
+      zoom={10}
+      scrollWheelZoom={false}
+      className="h-full w-full rounded-xl z-0"
+    >
 
-export default CountryMap;
+      {/* ========================= */}
+      {/* BASE MAP */}
+      {/* ========================= */}
+      <TileLayer
+        attribution="&copy; OpenStreetMap"
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+
+      {/* ========================= */}
+      {/* BATAS WILAYAH */}
+      {/* ========================= */}
+      {geoData && (
+        <GeoJSON
+          data={geoData}
+          interactive={false}
+          style={() => ({
+            color: "#2563eb",
+            weight: 4,
+            fillOpacity: 0,
+          })}
+        />
+      )}
+
+      {/* ========================= */}
+      {/* STORE MARKERS */}
+      {/* ========================= */}
+      {locations.map((location) => (
+
+        <CircleMarker
+          key={location.id}
+          center={[
+            location.latitude,
+            location.longitude,
+          ]}
+          radius={10}
+          pathOptions={{
+            color:
+              location.operationalStatus ===
+              "ONLINE"
+                ? "#22c55e"
+                : location.operationalStatus ===
+                  "OFFLINE"
+                ? "#ef4444"
+                : "#f59e0b",
+
+            fillColor:
+              location.operationalStatus ===
+              "ONLINE"
+                ? "#22c55e"
+                : location.operationalStatus ===
+                  "OFFLINE"
+                ? "#ef4444"
+                : "#f59e0b",
+
+            fillOpacity: 1,
+            weight: 2,
+          }}
+        >
+
+          <Popup>
+
+            <div className="space-y-1 text-sm">
+
+              <div className="font-semibold">
+                {location.name}
+              </div>
+
+              <div>
+                Status:
+                {" "}
+                <span
+                  className={
+                    location.operationalStatus ===
+                    "ONLINE"
+                      ? "text-green-600"
+                      : location.operationalStatus ===
+                        "OFFLINE"
+                      ? "text-red-500"
+                      : "text-yellow-600"
+                  }
+                >
+                  {
+                    location.operationalStatus
+                  }
+                </span>
+              </div>
+
+              <div className="text-xs text-gray-500">
+                Lat:
+                {" "}
+                {location.latitude}
+              </div>
+
+              <div className="text-xs text-gray-500">
+                Lng:
+                {" "}
+                {location.longitude}
+              </div>
+
+            </div>
+
+          </Popup>
+
+        </CircleMarker>
+      ))}
+    </MapContainer>
+  );
+}

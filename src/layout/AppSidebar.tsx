@@ -29,12 +29,12 @@ const navItems: NavItem[] = [
   {
     icon: <BoxCubeIcon />,
     name: "Objek Pajak",
-    path: "/calendar",
+    path: "/objek-pajak",
   },
   {
     icon: <ListIcon />,
     name: "Laporan Transaksi",
-    path: "/basic-tables",
+    path: "/laporan-transaksi",
   },
 ];
 
@@ -42,7 +42,7 @@ const othersItems: NavItem[] = [
     {
     icon: <UserCircleIcon />,
     name: "User Management",
-    path: "/data-tables",
+    path: "/user-management",
   },
 ];
 
