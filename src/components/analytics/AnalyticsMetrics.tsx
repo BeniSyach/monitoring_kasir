@@ -1,75 +1,205 @@
-import React from "react";
-import Badge from "../ui/badge/Badge";
+/* eslint-disable react-hooks/set-state-in-effect */
+"use client";
 
-const mockData = [
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
+interface Props {
+  startDate: string;
+  endDate: string;
+}
+
+interface MetricsResponse {
+  dasarPengenaanPajak: number;
+  pajak: number;
+  totalTransaksi: number;
+}
+
+export default function AnalyticsMetrics({
+  startDate,
+  endDate,
+}: Props) {
+
+  const [metrics, setMetrics] =
+    useState<MetricsResponse>({
+      dasarPengenaanPajak: 0,
+      pajak: 0,
+      totalTransaksi: 0,
+    });
+
+  const [loading, setLoading] =
+    useState(false);
+
+  // FORMAT ANGKA PENDEK
+const formatCurrencyShort = (
+  value: number
+) => {
+
+  if (value >= 1_000_000_000_000) {
+
+    return (
+      (value / 1_000_000_000_000)
+        .toFixed(1)
+        .replace(".0", "") + "T"
+    );
+  }
+
+  if (value >= 1_000_000_000) {
+
+    return (
+      (value / 1_000_000_000)
+        .toFixed(1)
+        .replace(".0", "") + "M"
+    );
+  }
+
+  if (value >= 1_000_000) {
+
+    return (
+      (value / 1_000_000)
+        .toFixed(1)
+        .replace(".0", "") + "Jt"
+    );
+  }
+
+  return new Intl.NumberFormat(
+    "id-ID"
+  ).format(value);
+};
+
+const formatFullNumber = (
+  value: number
+) => {
+
+  return new Intl.NumberFormat(
+    "id-ID"
+  ).format(value);
+};
+
+const items = [
+
   {
-    id: 1,
     title: "Dasar Pengenaan Pajak",
-    value: "24.7M",
-    change: "+20%",
-    direction: "up",
-    comparisonText: "Vs last month",
+
+    shortValue:
+      formatCurrencyShort(
+        metrics.dasarPengenaanPajak
+      ),
+
+    fullValue:
+      formatFullNumber(
+        metrics.dasarPengenaanPajak
+      ),
   },
+
   {
-    id: 2,
     title: "Pajak",
-    value: "55.9M",
-    change: "+4%",
-    direction: "up",
-    comparisonText: "Vs last month",
+
+    shortValue:
+      formatCurrencyShort(
+        metrics.pajak
+      ),
+
+    fullValue:
+      formatFullNumber(
+        metrics.pajak
+      ),
   },
+
   {
-    id: 3,
     title: "Total Transaksi",
-    value: "54M",
-    change: "-1.59%",
-    direction: "down",
-    comparisonText: "Vs last month",
+
+    shortValue:
+      formatCurrencyShort(
+        metrics.totalTransaksi
+      ),
+
+    fullValue:
+      formatFullNumber(
+        metrics.totalTransaksi
+      ),
   },
 
 ];
 
-const AnalyticsMetrics: React.FC = () => {
-return (
- <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 md:gap-6">
-    {mockData.map((item) => (
-      <div
-        key={item.id}
-        className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] dark:border-gray-800 dark:bg-white/[0.03]"
-      >
-        <p className="text-gray-500 text-theme-sm dark:text-gray-400">
-          {item.title}
-        </p>
+  // LOAD API
+  const loadMetrics = useCallback(async () => {
 
-        <div className="mt-3 flex items-end justify-between">
-          <div>
-            <h4 className="text-2xl font-bold text-gray-800 dark:text-white/90">
-              {item.value}
-            </h4>
-          </div>
+    try {
 
-          <div className="flex items-center gap-1">
-            <Badge
-              color={
-                item.direction === "up"
-                  ? "success"
-                  : item.direction === "down"
-                  ? "error"
-                  : "warning"
-              }
-            >
-              <span className="text-xs">{item.change}</span>
-            </Badge>
+      setLoading(true);
 
-            <span className="text-gray-500 text-theme-xs dark:text-gray-400">
-              {item.comparisonText}
-            </span>
-          </div>
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/dashboard/metrics?startDate=${startDate}&endDate=${endDate}`,
+        {
+          cache: "no-store",
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "Gagal mengambil data metrics"
+        );
+      }
+
+      const data: MetricsResponse =
+        await response.json();
+
+      setMetrics(data);
+
+    } catch (error) {
+
+      console.error(error);
+
+    } finally {
+
+      setLoading(false);
+    }
+
+  }, [startDate, endDate]);
+
+  // EFFECT
+  useEffect(() => {
+
+    loadMetrics();
+
+  }, [loadMetrics]);
+
+
+  return (
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 md:gap-6">
+
+      {items.map((item, index) => (
+
+        <div
+          key={index}
+          className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+        >
+
+          <p className="text-sm text-gray-500">
+            {item.title}
+          </p>
+
+        <div className="mt-3">
+
+          <h4 className="text-2xl font-bold text-gray-800">
+            {item.shortValue}
+          </h4>
+
+          <p className="mt-1 text-sm text-gray-500">
+            {item.fullValue}
+          </p>
+
         </div>
-      </div>
-    ))}
-  </div>
-);
-};
 
-export default AnalyticsMetrics;
+        </div>
+      ))}
+
+    </div>
+  );
+}

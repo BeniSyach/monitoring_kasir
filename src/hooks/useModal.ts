@@ -10,3 +10,11 @@ export const useModal = (initialState: boolean = false) => {
 
   return { isOpen, openModal, closeModal, toggleModal };
 };
+
+export const formatDate = (date: string) => {
+
+  const [year, month, day] =
+    date.split("-");
+
+  return `${day}-${month}-${year}`;
+};

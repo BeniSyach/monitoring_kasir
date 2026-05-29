@@ -1,45 +1,53 @@
-import React, { useState } from "react";
+import React from "react";
 
-const ChartTab: React.FC = () => {
-  const [selected, setSelected] = useState<
-    "optionOne" | "optionTwo" | "optionThree"
-  >("optionOne");
+interface Props {
+  selected: "Harian" | "Bulanan";
 
-  const getButtonClass = (option: "optionOne" | "optionTwo" | "optionThree") =>
+  onChange: (
+    value: "Harian" | "Bulanan"
+  ) => void;
+}
+
+export default function ChartTab({
+  selected,
+  onChange,
+}: Props) {
+
+  const getButtonClass = (
+    option: "Harian" | "Bulanan"
+  ) =>
+
     selected === option
-      ? "shadow-theme-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800"
-      : "text-gray-500 dark:text-gray-400";
+
+      ? "shadow-theme-xs text-gray-900 bg-white"
+
+      : "text-gray-500";
 
   return (
-    <div className="flex items-center gap-0.5 rounded-lg bg-gray-100 p-0.5 dark:bg-gray-900">
+    <div className="flex items-center gap-0.5 rounded-lg bg-gray-100 p-0.5">
+
       <button
-        onClick={() => setSelected("optionOne")}
-        className={`px-3 py-2 font-medium w-full rounded-md text-theme-sm hover:text-gray-900   dark:hover:text-white ${getButtonClass(
-          "optionOne"
+        onClick={() =>
+          onChange("Harian")
+        }
+        className={`px-3 py-2 font-medium rounded-md text-sm ${getButtonClass(
+          "Harian"
+        )}`}
+      >
+        Harian
+      </button>
+
+      <button
+        onClick={() =>
+          onChange("Bulanan")
+        }
+        className={`px-3 py-2 font-medium rounded-md text-sm ${getButtonClass(
+          "Bulanan"
         )}`}
       >
         Bulanan
       </button>
 
-      <button
-        onClick={() => setSelected("optionTwo")}
-        className={`px-3 py-2 font-medium w-full rounded-md text-theme-sm hover:text-gray-900   dark:hover:text-white ${getButtonClass(
-          "optionTwo"
-        )}`}
-      >
-        Kuartal
-      </button>
-
-      <button
-        onClick={() => setSelected("optionThree")}
-        className={`px-3 py-2 font-medium w-full rounded-md text-theme-sm hover:text-gray-900   dark:hover:text-white ${getButtonClass(
-          "optionThree"
-        )}`}
-      >
-        Harian
-      </button>
     </div>
   );
-};
-
-export default ChartTab;
+}
