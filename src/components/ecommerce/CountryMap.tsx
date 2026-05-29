@@ -87,7 +87,7 @@ export default function CountryMap() {
       try {
 
         const response = await fetch(
-          "http://localhost:8080/api/stores",
+         `${process.env.NEXT_PUBLIC_API_URL}/stores`,
           {
             cache: "no-store",
             credentials: "include",

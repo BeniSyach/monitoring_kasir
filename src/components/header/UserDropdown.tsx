@@ -19,7 +19,7 @@ export default function UserDropdown() {
     ?.split("=")[1];
 
   await fetch(
-    "http://localhost:8080/api/auth/logout",
+     `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
     {
       method: "POST",
       credentials: "include",
@@ -40,7 +40,7 @@ export default function UserDropdown() {
       const fetchMe = async () => {
         try {
           const res = await fetch(
-            "http://localhost:8080/api/users/me",
+            `${process.env.NEXT_PUBLIC_API_URL}/users/me`,
             {
               method: "GET",
               credentials: "include",

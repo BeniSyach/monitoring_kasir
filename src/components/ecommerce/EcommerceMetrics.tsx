@@ -64,7 +64,7 @@ export const EcommerceMetrics = () => {
         // LOAD STATS
         // =========================
         const statsRes = await fetch(
-          "http://localhost:8080/api/stores/stats",
+           `${process.env.NEXT_PUBLIC_API_URL}/stores/stats`,
           {
             cache: "no-store",
             credentials: "include",
@@ -81,7 +81,7 @@ export const EcommerceMetrics = () => {
         // LOAD OFFLINE DATA
         // =========================
         const offlineRes = await fetch(
-          "http://localhost:8080/api/stores/offline/latest",
+           `${process.env.NEXT_PUBLIC_API_URL}/stores/offline/latest`,
           {
             cache: "no-store",
              credentials: "include",

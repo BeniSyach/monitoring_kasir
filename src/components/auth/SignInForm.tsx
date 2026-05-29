@@ -32,7 +32,7 @@ export default function SignInForm() {
       setError("");
 
       const response = await fetch(
-        "http://localhost:8080/api/auth/login",
+         `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
         {
           method: "POST",
           credentials: "include",

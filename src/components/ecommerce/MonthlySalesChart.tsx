@@ -60,7 +60,7 @@ export default function MonthlySalesChart() {
         // TOP TRANSAKSI
         // =========================
         const transaksiRes = await fetch(
-          "http://localhost:8080/api/dashboard/top-transaksi",
+           `${process.env.NEXT_PUBLIC_API_URL}/dashboard/top-transaksi`,
           {
             cache: "no-store",
              credentials: "include",
@@ -76,7 +76,7 @@ export default function MonthlySalesChart() {
         // TOP PAJAK
         // =========================
         const pajakRes = await fetch(
-          "http://localhost:8080/api/dashboard/top-pajak",
+          `${process.env.NEXT_PUBLIC_API_URL}/dashboard/top-pajak`,
           {
             cache: "no-store",
              credentials: "include",
@@ -92,7 +92,7 @@ export default function MonthlySalesChart() {
         // LAST TRANSACTIONS
         // =========================
         const lastRes = await fetch(
-          "http://localhost:8080/api/dashboard/last-transactions",
+          `${process.env.NEXT_PUBLIC_API_URL}/dashboard/last-transactions`,
           {
             cache: "no-store",
              credentials: "include",
