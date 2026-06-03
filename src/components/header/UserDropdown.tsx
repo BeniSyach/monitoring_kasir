@@ -4,12 +4,11 @@ import React, { useEffect, useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { useRouter } from "next/navigation";
-import { User } from "../user-profile/UserInfoCard";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 export default function UserDropdown() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-     const [user, setUser] = useState<User | null>(null);
 
        const handleLogout = async () => {
 
@@ -35,34 +34,8 @@ export default function UserDropdown() {
 
   router.push("/signin");
 };
-  
-     useEffect(() => {
-      const fetchMe = async () => {
-        try {
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/users/me`,
-            {
-              method: "GET",
-              credentials: "include",
-            }
-          );
-  
-          if (!res.ok) {
-            throw new Error("Gagal mengambil user");
-          }
-  
-          const data = await res.json();
-  
-          setUser(data);
-        } catch (error) {
-          console.error(error);
-        }
-      };
-  
-      fetchMe();
-    }, []);
 
-
+const user = useCurrentUser();
 
 function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
   e.stopPropagation();

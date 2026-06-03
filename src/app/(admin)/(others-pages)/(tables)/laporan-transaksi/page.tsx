@@ -1,6 +1,7 @@
 import ComponentCard from "@/components/common/ComponentCard";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import DataTableOne from "@/components/tables/DataTables/TableOne/DataTableOne";
+import LaporanTransaksiTable from "@/components/tables/DataTables/TableOne/laporan-pajak-table";
+import LaporanTransaksiComponent from "@/components/tables/DataTables/TableOne/LaporanTransaksiComponent";
 import { Metadata } from "next";
 import React from "react";
 
@@ -14,11 +15,7 @@ export default function BasicTables() {
   return (
     <div>
       <PageBreadcrumb pageTitle="Laporan Transaksi" />
-      <div className="space-y-6">
-        <ComponentCard title="Laporan Transaksi">
-          <DataTableOne />
-        </ComponentCard>
-      </div>
+      <LaporanTransaksiComponent />
     </div>
   );
 }

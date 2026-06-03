@@ -6,39 +6,12 @@ import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import Image from "next/image";
-import { User } from "./UserInfoCard";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 
 export default function UserMetaCard() {
   const { isOpen, openModal, closeModal } = useModal();
-
-     const [user, setUser] = useState<User | null>(null);
-  
-     useEffect(() => {
-      const fetchMe = async () => {
-        try {
-          const res = await fetch(
-             `${process.env.NEXT_PUBLIC_API_URL}/users/me`,
-            {
-              method: "GET",
-              credentials: "include",
-            }
-          );
-  
-          if (!res.ok) {
-            throw new Error("Gagal mengambil user");
-          }
-  
-          const data = await res.json();
-  
-          setUser(data);
-        } catch (error) {
-          console.error(error);
-        }
-      };
-  
-      fetchMe();
-    }, []);
+  const user = useCurrentUser();
   const handleSave = () => {
     // Handle save logic here
     console.log("Saving changes...");

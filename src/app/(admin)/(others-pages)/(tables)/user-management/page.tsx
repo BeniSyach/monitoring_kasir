@@ -1,6 +1,6 @@
 import ComponentCard from "@/components/common/ComponentCard";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import DataTableTwo from "@/components/tables/DataTables/TableTwo/DataTableTwo";
+import UserManagementTable from "@/components/tables/DataTables/TableTwo/UserManagementTable";
 
 import { Metadata } from "next";
 import React from "react";
@@ -17,7 +17,7 @@ export default function DataTables() {
       <PageBreadcrumb pageTitle="User Management" />
       <div className="space-y-5 sm:space-y-6">
         <ComponentCard title="User Management">
-          <DataTableTwo />
+          <UserManagementTable />
         </ComponentCard>
 
       </div>
