@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { useRouter } from "next/navigation";
@@ -55,7 +55,7 @@ function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
           <Image
             width={44}
             height={44}
-            src="/images/user/owner.jpg"
+            src="/images/user/owner.png"
             alt="User"
           />
         </span>
