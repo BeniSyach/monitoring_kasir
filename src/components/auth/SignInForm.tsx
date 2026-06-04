@@ -56,7 +56,8 @@ export default function SignInForm() {
       }
 
       // redirect
-      router.push("/");
+      router.replace("/");
+      router.refresh();
     } catch (err: unknown) {
       if (err instanceof Error) {
        setError(err.message);
