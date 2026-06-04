@@ -63,8 +63,8 @@ export default function FilterPeriode({
     );
   };
 
-  return (
-    <div className="inline-flex items-end gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+return (
+    <div className="inline-flex items-end gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
       <div className="w-[280px]">
         <DatePicker
           id="periode"
@@ -85,7 +85,7 @@ export default function FilterPeriode({
 
       <button
         onClick={handleFilter}
-        className="h-9 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition hover:bg-blue-700"
+        className="h-9 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400"
       >
         Filter
       </button>

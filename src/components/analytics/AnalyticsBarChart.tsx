@@ -203,18 +203,18 @@ const options: ApexOptions = {
     },
   ];
 
-  return (
-    <div className="rounded-2xl border border-gray-200 bg-white px-5 pt-5 sm:px-6 sm:pt-6">
+return (
+    <div className="rounded-2xl border border-gray-200 bg-white px-5 pt-5 sm:px-6 sm:pt-6 dark:border-gray-700 dark:bg-gray-900">
 
       <div className="flex flex-wrap items-start justify-between gap-5">
 
         <div>
 
-          <h3 className="mb-1 text-lg font-semibold text-gray-800">
+          <h3 className="mb-1 text-lg font-semibold text-gray-800 dark:text-gray-100">
             Transaksi Periode {formatDate(startDate)} s/d {formatDate(endDate)}
           </h3>
 
-          <span className="block text-sm text-gray-500">
+          <span className="block text-sm text-gray-500 dark:text-gray-400">
             Statistik transaksi objek pajak
           </span>
 

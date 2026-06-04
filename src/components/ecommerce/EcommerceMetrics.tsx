@@ -143,10 +143,10 @@ export const EcommerceMetrics = () => {
 
   }, []);
 
-  if (dashboard.loading) {
+if (dashboard.loading) {
     return (
-      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-        <p className="text-sm text-gray-500">
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           Loading dashboard...
         </p>
       </div>
@@ -159,17 +159,17 @@ export const EcommerceMetrics = () => {
       {/* ========================= */}
       {/* CARD TOTAL */}
       {/* ========================= */}
-      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
 
         {/* Header */}
         <div className="flex items-center gap-1">
 
-          <h3 className="text-sm font-medium text-gray-700">
+          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Total Pemasangan
           </h3>
 
           <svg
-            className="h-3 w-3 text-sky-500"
+            className="h-3 w-3 text-sky-500 dark:text-sky-400"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -187,14 +187,14 @@ export const EcommerceMetrics = () => {
         {/* Total */}
         <div className="flex items-center justify-center py-6">
 
-          <h1 className="text-4xl font-light text-gray-700">
+          <h1 className="text-4xl font-light text-gray-700 dark:text-gray-100">
             {dashboard.total}
           </h1>
 
         </div>
 
         {/* Bottom */}
-        <div className="overflow-hidden rounded-md border border-gray-200">
+        <div className="overflow-hidden rounded-md border border-gray-200 dark:border-gray-700">
 
           {/* Color Bar */}
           <div className="flex h-1.5 w-full">
@@ -218,11 +218,11 @@ export const EcommerceMetrics = () => {
                 className="py-3"
               >
 
-                <p className="text-[11px] text-gray-500">
+                <p className="text-[11px] text-gray-500 dark:text-gray-400">
                   {item.label}
                 </p>
 
-                <h4 className="mt-1 text-xl font-light text-sky-900">
+                <h4 className="mt-1 text-xl font-light text-sky-900 dark:text-sky-300">
                   {item.value}
                 </h4>
 
@@ -236,14 +236,14 @@ export const EcommerceMetrics = () => {
       {/* ========================= */}
       {/* CARD OFFLINE */}
       {/* ========================= */}
-      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
 
-        <h3 className="text-base font-medium text-gray-700">
+        <h3 className="text-base font-medium text-gray-700 dark:text-gray-300">
           5 Besar Wajib Pajak Offline Terkini
         </h3>
 
         {/* Header Table */}
-        <div className="mt-6 grid grid-cols-12 border-b border-gray-200 pb-3 text-sm font-medium text-gray-500">
+        <div className="mt-6 grid grid-cols-12 border-b border-gray-200 pb-3 text-sm font-medium text-gray-500 dark:border-gray-700 dark:text-gray-400">
 
           <div className="col-span-1">
             No.
@@ -264,7 +264,7 @@ export const EcommerceMetrics = () => {
 
           {dashboard.offlineData.length === 0 && (
 
-            <div className="py-5 text-center text-sm text-gray-400">
+            <div className="py-5 text-center text-sm text-gray-400 dark:text-gray-500">
               Tidak ada data offline
             </div>
 
@@ -274,18 +274,18 @@ export const EcommerceMetrics = () => {
 
             <div
               key={index}
-              className="grid grid-cols-12 items-center border-b border-gray-100 py-4 last:border-0"
+              className="grid grid-cols-12 items-center border-b border-gray-100 py-4 last:border-0 dark:border-gray-800"
             >
 
-              <div className="col-span-1 text-sm text-gray-700">
+              <div className="col-span-1 text-sm text-gray-700 dark:text-gray-300">
                 {index + 1}.
               </div>
 
-              <div className="col-span-7 text-sm text-gray-800">
+              <div className="col-span-7 text-sm text-gray-800 dark:text-gray-200">
                 {item.name}
               </div>
 
-              <div className="col-span-4 text-sm font-medium text-red-500">
+              <div className="col-span-4 text-sm font-medium text-red-500 dark:text-red-400">
                 {item.date}
               </div>
 

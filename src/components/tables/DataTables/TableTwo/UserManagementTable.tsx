@@ -325,499 +325,362 @@ const closeEditModal = () => {
   const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
   const currentData = filteredAndSortedData.slice(startIndex, endIndex);
 
-  return (
-    <div className="overflow-hidden rounded-xl bg-white dark:bg-white/[0.03]">
-      <div className="flex flex-col gap-2 px-4 py-4 border border-b-0 border-gray-100 dark:border-white/[0.05] rounded-t-xl sm:flex-row sm:items-center sm:justify-between">
+return (
+    <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+
+      {/* ── Toolbar ── */}
+      <div className="flex flex-col gap-3 border-b border-gray-100 bg-gray-50/60 px-5 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800 dark:bg-gray-800/40">
 
         <div className="flex items-center gap-3">
-<Button
-  size="sm"
-  onClick={createModal.openModal}
->
-  + Tambah User
-</Button>
-          <span className="text-gray-500 dark:text-gray-400"> Show </span>
-          <div className="relative z-20 bg-transparent">
+
+          <Button size="sm" onClick={createModal.openModal}>
+            + Tambah User
+          </Button>
+
+          <span className="text-xs font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500">
+            Tampilkan
+          </span>
+
+          <div className="relative">
             <select
-              className="w-full py-2 pl-3 pr-8 text-sm text-gray-800 bg-transparent border border-gray-300 rounded-lg appearance-none dark:bg-dark-900 h-9 bg-none shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+              className="h-8 appearance-none rounded-lg border border-gray-200 bg-white py-0 pl-3 pr-7 text-sm font-medium text-gray-700 shadow-sm outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
               value={itemsPerPage}
               onChange={(e) => setItemsPerPage(Number(e.target.value))}
             >
               {[5, 8, 10].map((value) => (
-                <option
-                  key={value}
-                  value={value}
-                  className="text-gray-500 dark:bg-gray-900 dark:text-gray-400"
-                >
+                <option key={value} value={value} className="dark:bg-gray-800">
                   {value}
                 </option>
               ))}
             </select>
-            <span className="absolute z-30 text-gray-500 -translate-y-1/2 right-2 top-1/2 dark:text-gray-400">
-              <svg
-                className="stroke-current"
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M3.8335 5.9165L8.00016 10.0832L12.1668 5.9165"
-                  stroke=""
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+            <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                <path d="M3.8335 5.9165L8.00016 10.0832L12.1668 5.9165" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </span>
           </div>
-          <span className="text-gray-500 dark:text-gray-400"> entries </span>
+
+          <span className="text-xs font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500">
+            entri
+          </span>
+
         </div>
 
+        {/* Search */}
         <div className="relative">
-          <button className="absolute text-gray-500 -translate-y-1/2 left-4 top-1/2 dark:text-gray-400">
-            <svg
-              className="fill-current"
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M3.04199 9.37363C3.04199 5.87693 5.87735 3.04199 9.37533 3.04199C12.8733 3.04199 15.7087 5.87693 15.7087 9.37363C15.7087 12.8703 12.8733 15.7053 9.37533 15.7053C5.87735 15.7053 3.04199 12.8703 3.04199 9.37363ZM9.37533 1.54199C5.04926 1.54199 1.54199 5.04817 1.54199 9.37363C1.54199 13.6991 5.04926 17.2053 9.37533 17.2053C11.2676 17.2053 13.0032 16.5344 14.3572 15.4176L17.1773 18.238C17.4702 18.5309 17.945 18.5309 18.2379 18.238C18.5308 17.9451 18.5309 17.4703 18.238 17.1773L15.4182 14.3573C16.5367 13.0033 17.2087 11.2669 17.2087 9.37363C17.2087 5.04817 13.7014 1.54199 9.37533 1.54199Z"
-                fill=""
-              />
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+              <path fillRule="evenodd" clipRule="evenodd" d="M3.04199 9.37363C3.04199 5.87693 5.87735 3.04199 9.37533 3.04199C12.8733 3.04199 15.7087 5.87693 15.7087 9.37363C15.7087 12.8703 12.8733 15.7053 9.37533 15.7053C5.87735 15.7053 3.04199 12.8703 3.04199 9.37363ZM9.37533 1.54199C5.04926 1.54199 1.54199 5.04817 1.54199 9.37363C1.54199 13.6991 5.04926 17.2053 9.37533 17.2053C11.2676 17.2053 13.0032 16.5344 14.3572 15.4176L17.1773 18.238C17.4702 18.5309 17.945 18.5309 18.2379 18.238C18.5308 17.9451 18.5309 17.4703 18.238 17.1773L15.4182 14.3573C16.5367 13.0033 17.2087 11.2669 17.2087 9.37363C17.2087 5.04817 13.7014 1.54199 9.37533 1.54199Z" fill="currentColor"/>
             </svg>
-          </button>
+          </span>
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search..."
-            className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent py-2.5 pl-11 pr-4 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[300px]"
+            placeholder="Cari user..."
+            className="h-9 w-full rounded-lg border border-gray-200 bg-white py-0 pl-9 pr-4 text-sm text-gray-700 shadow-sm outline-none transition placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500 xl:w-[280px]"
           />
         </div>
+
       </div>
 
+      {/* ── Table ── */}
       <div className="max-w-full overflow-x-auto custom-scrollbar">
-        <div>
-          <Table>
-            <TableHeader className="border-t border-gray-100 dark:border-white/[0.05]">
-              <TableRow>
-                {[
-  {
-    key: "username",
-    label: "Username",
-  },
-  {
-    key: "email",
-    label: "Email",
-  },
-  {
-    key: "role",
-    label: "Role",
-  },
-].map(({ key, label }) => (
-                  <TableCell
-                    key={key}
-                    isHeader
-                    className="px-4 py-3 border border-gray-100 dark:border-white/[0.05]"
+        <Table>
+
+          <TableHeader>
+            <TableRow className="bg-gray-50 dark:bg-gray-800/60">
+
+              {[
+                { key: "username", label: "Username" },
+                { key: "email", label: "Email" },
+                { key: "role", label: "Role" },
+              ].map(({ key, label }) => (
+                <TableCell
+                  key={key}
+                  isHeader
+                  className="border-b border-gray-100 px-5 py-3.5 dark:border-gray-800"
+                >
+                  <div
+                    className="flex cursor-pointer items-center justify-between gap-3"
+                    onClick={() => handleSort(key as SortKey)}
                   >
-                    <div
-                      className="flex items-center justify-between cursor-pointer"
-                      onClick={() => handleSort(key as SortKey)}
+                    <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      {label}
+                    </p>
+                    <button className="flex flex-col gap-0.5">
+                      <AngleUpIcon
+                        className={`text-gray-300 dark:text-gray-700 ${
+                          sortKey === key && sortOrder === "asc" ? "text-brand-500" : ""
+                        }`}
+                      />
+                      <AngleDownIcon
+                        className={`text-gray-300 dark:text-gray-700 ${
+                          sortKey === key && sortOrder === "desc" ? "text-brand-500" : ""
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </TableCell>
+              ))}
+
+              <TableCell
+                isHeader
+                className="border-b border-gray-100 px-5 py-3.5 dark:border-gray-800"
+              >
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  Aksi
+                </p>
+              </TableCell>
+
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={4} className="py-16 text-center text-sm text-gray-400 dark:text-gray-500">
+                  <div className="flex flex-col items-center gap-2">
+                    <svg className="h-5 w-5 animate-spin text-gray-300" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                    </svg>
+                    Memuat data...
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : currentData.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="py-16 text-center text-sm text-gray-400 dark:text-gray-500">
+                  Data tidak ditemukan
+                </TableCell>
+              </TableRow>
+            ) : (
+              currentData.map((user) => (
+                <TableRow
+                  key={user.id}
+                  className="group border-b border-gray-50 transition-colors last:border-0 hover:bg-blue-50/50 dark:border-gray-800/60 dark:hover:bg-blue-950/20"
+                >
+
+                  <TableCell className="px-5 py-3.5 text-sm font-semibold text-gray-800 dark:text-gray-100">
+                    {user.username}
+                  </TableCell>
+
+                  <TableCell className="px-5 py-3.5 text-sm text-gray-500 dark:text-gray-400">
+                    {user.email}
+                  </TableCell>
+
+                  <TableCell className="px-5 py-3.5">
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                        user.role === "ROLE_ADMIN"
+                          ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                          : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                      }`}
                     >
-                      <p className="font-medium text-gray-700 text-theme-xs dark:text-gray-400">
-                        {label}
-                      </p>
-                      <button className="flex flex-col gap-0.5">
-                        <AngleUpIcon
-                          className={`text-gray-300 dark:text-gray-700 ${
-                            sortKey === key && sortOrder === "asc"
-                              ? "text-brand-500"
-                              : ""
-                          }`}
-                        />
-                        <AngleDownIcon
-                          className={`text-gray-300 dark:text-gray-700 ${
-                            sortKey === key && sortOrder === "desc"
-                              ? "text-brand-500"
-                              : ""
-                          }`}
-                        />
+                      {user.role === "ROLE_ADMIN" ? "Admin" : "User"}
+                    </span>
+                  </TableCell>
+
+                  <TableCell className="px-5 py-3.5">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => { setUserToDelete(user); deleteModal.openModal(); }}
+                        className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+                        title="Hapus"
+                      >
+                        <TrashBinIcon />
+                      </button>
+                      <button
+                        onClick={() => openEditModal(user)}
+                        className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+                        title="Edit"
+                      >
+                        <PencilIcon />
                       </button>
                     </div>
                   </TableCell>
-                ))}
-                <TableCell
-                  isHeader
-                  className="px-4 py-3 border border-gray-100 dark:border-white/[0.05]"
-                >
-                  <p className="font-medium text-gray-700 text-theme-xs dark:text-gray-400">
-                    Action
-                  </p>
-                </TableCell>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-                {loading ? (
-                <TableRow>
-                <TableCell
-                colSpan={4}
-                    className="text-center py-10"
-                >
-                    Loading...
-                </TableCell>
-                </TableRow>
-            ) : (
-                currentData.length === 0 ? (
-  <TableRow>
-    <TableCell
-      colSpan={4}
-      className="py-10 text-center"
-    >
-      Data tidak ditemukan
-    </TableCell>
-  </TableRow>
-) : (
-             currentData.map((user) => (
-                <TableRow  key={user.id}>
-                  <TableCell className="px-4 py-4 font-medium text-gray-800 border border-gray-100 dark:border-white/[0.05] dark:text-white text-theme-sm whitespace-nowrap ">
-                    {user.username}
-                  </TableCell>
-                  <TableCell className="px-4 py-4 font-normal text-gray-800 border border-gray-100 dark:border-white/[0.05] text-theme-sm dark:text-gray-400 whitespace-nowrap ">
-                      {user.email}
-                  </TableCell>
-                  <TableCell className="px-4 py-4 border">
-                    <span
-                    className={
-                        user.role === "ROLE_ADMIN"
-                        ? "text-green-600 font-semibold"
-                        : "text-blue-600 font-semibold"
-                    }
-                    >
-                    {user.role}
-                    </span>
-                </TableCell>
-                  <TableCell className="px-4 py-4 font-normal text-gray-800 border border-gray-100 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap ">
-                    <div className="flex items-center w-full gap-2">
-                        <button
-                        onClick={() => {
-                            setUserToDelete(user);
-                            deleteModal.openModal();
-                        }}
-                        className="text-red-500"
-                        >
-                        <TrashBinIcon />
-                        </button>
-                    <button
-                     onClick={() => openEditModal(user)}
-                    className="text-gray-500 hover:text-gray-800"
-                    >
-                    <PencilIcon />
-                    </button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-           ))
 
-))}
-            </TableBody>
-          </Table>
-        </div>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+
+        </Table>
       </div>
 
-      <div className="border border-t-0 rounded-b-xl border-gray-100 py-4 pl-[18px] pr-4 dark:border-white/[0.05]">
-        <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between">
-          {/* Left side: Showing entries */}
+      {/* ── Footer ── */}
+      <div className="flex flex-col items-center justify-between gap-4 border-t border-gray-100 bg-gray-50/60 px-5 py-4 xl:flex-row dark:border-gray-800 dark:bg-gray-800/40">
 
-          <PaginationWithButton
-            totalPages={totalPages}
-            initialPage={currentPage}
-            onPageChange={handlePageChange}
-          />
-          <div className="pt-3 xl:pt-0">
-            <p className="pt-3 text-sm font-medium text-center text-gray-500 border-t border-gray-100 dark:border-gray-800 dark:text-gray-400 xl:border-t-0 xl:pt-0 xl:text-left">
-              Showing {startIndex + 1} to {endIndex} of {totalItems} entries
-            </p>
+        <PaginationWithButton
+          totalPages={totalPages}
+          initialPage={currentPage}
+          onPageChange={handlePageChange}
+        />
+
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Menampilkan{" "}
+          <span className="font-semibold text-gray-700 dark:text-gray-300">
+            {startIndex + 1}–{endIndex}
+          </span>{" "}
+          dari{" "}
+          <span className="font-semibold text-gray-700 dark:text-gray-300">
+            {totalItems}
+          </span>{" "}
+          entri
+        </p>
+
+      </div>
+
+      {/* ── Modal: Edit User ── */}
+      <Modal isOpen={editModal.isOpen} onClose={editModal.closeModal} className="max-w-[560px] p-6">
+
+        <h4 className="mb-1 text-lg font-semibold text-gray-800 dark:text-gray-100">Edit User</h4>
+        <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">Perbarui informasi akun pengguna</p>
+
+        <div className="space-y-3">
+          {[
+            { type: "text", value: formData.username, field: "username", placeholder: "Username" },
+            { type: "email", value: formData.email, field: "email", placeholder: "Email" },
+            { type: "password", value: formData.password, field: "password", placeholder: "Kosongkan jika tidak diganti" },
+          ].map(({ type, value, field, placeholder }) => (
+            <input
+              key={field}
+              type={type}
+              value={value}
+              onChange={(e) => setFormData({ ...formData, [field]: e.target.value })}
+              placeholder={placeholder}
+              className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:placeholder:text-gray-500"
+            />
+          ))}
+
+          <select
+            value={formData.role}
+            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+            className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+          >
+            <option value="ROLE_ADMIN">Admin</option>
+            <option value="ROLE_USER">User</option>
+          </select>
+        </div>
+
+        <div className="mt-6 flex justify-end gap-3">
+          <Button variant="outline" onClick={closeEditModal}>Batal</Button>
+          <Button onClick={handleUpdate} disabled={saving}>
+            {saving ? "Menyimpan..." : "Simpan"}
+          </Button>
+        </div>
+
+      </Modal>
+
+      {/* ── Modal: Tambah User ── */}
+      <Modal isOpen={createModal.isOpen} onClose={createModal.closeModal} className="max-w-[560px] p-6">
+
+        <h4 className="mb-1 text-lg font-semibold text-gray-800 dark:text-gray-100">Tambah User</h4>
+        <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">Buat akun pengguna baru</p>
+
+        <div className="space-y-3">
+          {[
+            { type: "text", value: createFormData.username, field: "username", placeholder: "Username" },
+            { type: "email", value: createFormData.email, field: "email", placeholder: "Email" },
+            { type: "password", value: createFormData.password, field: "password", placeholder: "Password" },
+          ].map(({ type, value, field, placeholder }) => (
+            <input
+              key={field}
+              type={type}
+              value={value}
+              onChange={(e) => setCreateFormData({ ...createFormData, [field]: e.target.value })}
+              placeholder={placeholder}
+              className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:placeholder:text-gray-500"
+            />
+          ))}
+
+          <select
+            value={createFormData.role}
+            onChange={(e) => setCreateFormData({ ...createFormData, role: e.target.value })}
+            className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+          >
+            <option value="ROLE_ADMIN">Admin</option>
+            <option value="ROLE_USER">User</option>
+          </select>
+        </div>
+
+        {formError && (
+          <div className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
+            {formError}
           </div>
+        )}
+
+        <div className="mt-6 flex justify-end gap-3">
+          <Button variant="outline" onClick={closeCreateModal}>Batal</Button>
+          <Button onClick={handleCreate} disabled={saving}>
+            {saving ? "Menyimpan..." : "Simpan"}
+          </Button>
         </div>
-      </div>
-<Modal
-  isOpen={editModal.isOpen}
-  onClose={editModal.closeModal}
-  className="max-w-[600px] p-6"
->
-  <h4 className="mb-6 text-xl font-semibold">
-    Edit User
-  </h4>
 
-  <div className="space-y-4">
+      </Modal>
 
-    <input
-      type="text"
-      value={formData.username}
-      onChange={(e) =>
-        setFormData({
-          ...formData,
-          username: e.target.value,
-        })
-      }
-      placeholder="Username"
-      className="w-full p-3 border rounded-lg"
-    />
+      {/* ── Modal: Hapus User ── */}
+      <Modal isOpen={deleteModal.isOpen} onClose={deleteModal.closeModal} className="max-w-[440px] p-6">
+        <div className="text-center">
 
-    <input
-      type="email"
-      value={formData.email}
-      onChange={(e) =>
-        setFormData({
-          ...formData,
-          email: e.target.value,
-        })
-      }
-      placeholder="Email"
-      className="w-full p-3 border rounded-lg"
-    />
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+            <TrashBinIcon className="h-6 w-6 text-red-500 dark:text-red-400" />
+          </div>
 
-    <input
-      type="password"
-      value={formData.password}
-      onChange={(e) =>
-        setFormData({
-          ...formData,
-          password: e.target.value,
-        })
-      }
-      placeholder="Kosongkan jika tidak diganti"
-      className="w-full p-3 border rounded-lg"
-    />
+          <h3 className="mb-1 text-lg font-semibold text-gray-800 dark:text-gray-100">Hapus User</h3>
+          <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">
+            Yakin ingin menghapus{" "}
+            <span className="font-semibold text-gray-700 dark:text-gray-300">{userToDelete?.username}</span>?
+            Tindakan ini tidak dapat dibatalkan.
+          </p>
 
-    <select
-      value={formData.role}
-      onChange={(e) =>
-        setFormData({
-          ...formData,
-          role: e.target.value,
-        })
-      }
-      className="w-full p-3 border rounded-lg"
-    >
-<option value="ROLE_ADMIN">
-  ADMIN
-</option>
+          <div className="flex justify-center gap-3">
+            <Button variant="outline" onClick={() => { setUserToDelete(null); deleteModal.closeModal(); }}>
+              Batal
+            </Button>
+            <Button onClick={handleDelete} disabled={saving}>
+              {saving ? "Menghapus..." : "Hapus"}
+            </Button>
+          </div>
 
-<option value="ROLE_USER">
-  USER
-</option>
-    </select>
+        </div>
+      </Modal>
 
-  </div>
+      {/* ── Modal: Berhasil ── */}
+      <Modal isOpen={successModal.isOpen} onClose={successModal.closeModal} className="max-w-[440px] p-6">
+        <div className="text-center">
 
-  <div className="flex justify-end gap-3 mt-8">
-    <Button
-      variant="outline"
-     onClick={closeEditModal}
-    >
-      Batal
-    </Button>
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+            <svg className="h-6 w-6 text-green-500 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
 
-    <Button onClick={handleUpdate} disabled={saving}>
-     {saving ? "Menyimpan..." : "Simpan"}
-    </Button>
-  </div>
-</Modal>
-<Modal
-  isOpen={successModal.isOpen}
-  onClose={successModal.closeModal}
-  className="max-w-[500px] p-8"
->
-  <div className="text-center">
+          <h3 className="mb-1 text-lg font-semibold text-gray-800 dark:text-gray-100">Berhasil</h3>
+          <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">{successMessage}</p>
+          <Button onClick={successModal.closeModal}>OK</Button>
 
-    <h3 className="mb-3 text-2xl font-semibold text-success-600">
-      Berhasil
-    </h3>
-<p className="mb-6 text-gray-500">
-  {successMessage}
-</p>
+        </div>
+      </Modal>
 
-    <Button
-       onClick={() => {
-    successModal.closeModal();
-  }}
-    >
-      OK
-    </Button>
+      {/* ── Modal: Gagal ── */}
+      <Modal isOpen={errorModal.isOpen} onClose={errorModal.closeModal} className="max-w-[440px] p-6">
+        <div className="text-center">
 
-  </div>
-</Modal>
-<Modal
-  isOpen={errorModal.isOpen}
-  onClose={errorModal.closeModal}
-  className="max-w-[500px] p-8"
->
-  <div className="text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+            <svg className="h-6 w-6 text-red-500 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </div>
 
-    <h3 className="mb-3 text-2xl font-semibold text-error-600">
-      Gagal
-    </h3>
+          <h3 className="mb-1 text-lg font-semibold text-gray-800 dark:text-gray-100">Gagal</h3>
+          <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">{errorMessage}</p>
+          <Button variant="outline" onClick={errorModal.closeModal}>Tutup</Button>
 
-    <p className="mb-6 text-gray-500">
-    {errorMessage}
-    </p>
+        </div>
+      </Modal>
 
-    <Button
-      variant="outline"
-      onClick={errorModal.closeModal}
-    >
-      Tutup
-    </Button>
-
-  </div>
-</Modal>
-<Modal
-  isOpen={deleteModal.isOpen}
-  onClose={deleteModal.closeModal}
-  className="max-w-[500px] p-6"
->
-  <div className="text-center">
-
-    <h3 className="mb-3 text-xl font-semibold text-error-600">
-      Hapus User
-    </h3>
-
-    <p className="mb-6 text-gray-500">
-      Yakin ingin menghapus user
-      <br />
-      <strong>
-        {userToDelete?.username}
-      </strong>
-      ?
-    </p>
-
-    <div className="flex justify-center gap-3">
-
-      <Button
-        variant="outline"
-        onClick={() => {
-          setUserToDelete(null);
-          deleteModal.closeModal();
-        }}
-      >
-        Batal
-      </Button>
-
-      <Button
-        onClick={handleDelete}
-        disabled={saving}
-      >
-       {saving ? "Menghapus..." : "Hapus"}
-      </Button>
-
-    </div>
-
-  </div>
-</Modal>
-<Modal
-  isOpen={createModal.isOpen}
-  onClose={createModal.closeModal}
-  className="max-w-[600px] p-6"
->
-  <h4 className="mb-6 text-xl font-semibold">
-    Tambah User
-  </h4>
-
-  <div className="space-y-4">
-
-    <input
-      type="text"
-      value={createFormData.username}
-      onChange={(e) =>
-        setCreateFormData({
-          ...createFormData,
-          username: e.target.value,
-        })
-      }
-      placeholder="Username"
-      className="w-full p-3 border rounded-lg"
-    />
-
-    <input
-      type="email"
-      value={createFormData.email}
-      onChange={(e) =>
-        setCreateFormData({
-          ...createFormData,
-          email: e.target.value,
-        })
-      }
-      placeholder="Email"
-      className="w-full p-3 border rounded-lg"
-    />
-
-    <input
-      type="password"
-      value={createFormData.password}
-      onChange={(e) =>
-        setCreateFormData({
-          ...createFormData,
-          password: e.target.value,
-        })
-      }
-      placeholder="Password"
-      className="w-full p-3 border rounded-lg"
-    />
-
-    <select
-      value={createFormData.role}
-      onChange={(e) =>
-        setCreateFormData({
-          ...createFormData,
-          role: e.target.value,
-        })
-      }
-      className="w-full p-3 border rounded-lg"
-    >
-      <option value="ROLE_ADMIN">
-        ADMIN
-      </option>
-
-      <option value="ROLE_USER">
-        USER
-      </option>
-    </select>
-
-  </div>
-{
-  formError && (
-    <div className="p-3 text-sm text-red-600 bg-red-50 rounded-lg">
-      {formError}
-    </div>
-  )
-}
-  <div className="flex justify-end gap-3 mt-8">
-
-    <Button
-      variant="outline"
-     onClick={closeCreateModal}
-    >
-      Batal
-    </Button>
-
-    <Button
-      onClick={handleCreate}
-       disabled={saving}
-    >
-      {saving ? "Menyimpan..." : "Simpan"}
-    </Button>
-
-  </div>
-
-</Modal>
     </div>
   );
 }

@@ -172,30 +172,30 @@ const items = [
 
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 md:gap-6">
+<div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 md:gap-6">
 
       {items.map((item, index) => (
 
         <div
           key={index}
-          className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+          className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900"
         >
 
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             {item.title}
           </p>
 
-        <div className="mt-3">
+          <div className="mt-3">
 
-          <h4 className="text-2xl font-bold text-gray-800">
-            {item.shortValue}
-          </h4>
+            <h4 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+              {item.shortValue}
+            </h4>
 
-          <p className="mt-1 text-sm text-gray-500">
-            {item.fullValue}
-          </p>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              {item.fullValue}
+            </p>
 
-        </div>
+          </div>
 
         </div>
       ))}
