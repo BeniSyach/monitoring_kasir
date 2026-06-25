@@ -9,8 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from "../../../ui/table";
-import { AngleDownIcon, AngleUpIcon } from "@/icons";
-import Image from "next/image";
 import PaginationWithIcon from "./PaginationWithIcon";
 
 interface ApiRow {
@@ -33,7 +31,6 @@ interface PivotRow {
   transaksiHarian: Record<number, number>;
 }
 
-
 interface Props {
   startDate: string;
   endDate: string;
@@ -41,136 +38,130 @@ interface Props {
 
 type SortOrder = "asc" | "desc";
 
-export default function LaporanTransaksiTable({
-  startDate,
-  endDate,
-}: Props) {
-    const [data, setData] = useState<ApiRow[]>([]);
-     const [loading, setLoading] = useState(true);
-       const [sortKey, setSortKey] = useState("npwpd");
-       const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+export default function LaporanTransaksiTable({ startDate, endDate }: Props) {
+  const [data, setData] = useState<ApiRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [sortKey, setSortKey] = useState("npwpd");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+
+  // ── Tidak lagi dari server, semua client-side ──
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
-    const [totalPages, setTotalPages] = useState(0);
-  const [totalItems, setTotalItems] = useState(0);
 
-    const loadData = async () => {
-      try {
-        setLoading(true);
-  
-        const params = new URLSearchParams({
-          startDate,
-          endDate,
-          page: String(currentPage - 1),
-          size: String(itemsPerPage),
-          search: searchTerm,
-          sortKey,
-          sortOrder,
-        });
-  
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/dashboard/objek-pajak?${params}`,
-          {
-            cache: "no-store",
-            credentials: "include",
-          }
-        );
-  
-        const result = await res.json();
-  
-        setData(result.data ?? []);
-        setTotalPages(result.totalPages ?? 0);
-        setTotalItems(result.totalItems ?? 0);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    useEffect(() => {
-      setCurrentPage(1);
-    }, [startDate, endDate, searchTerm, itemsPerPage]);
-  
-    useEffect(() => {
-      loadData();
-    }, [startDate, endDate, currentPage, sortKey, sortOrder, itemsPerPage, searchTerm]);
+  // ── Fetch semua data sekaligus (tanpa page/size/search) ──
+  const loadData = async () => {
+    try {
+      setLoading(true);
 
-  const daysInMonth = useMemo(() => {
-  if (!startDate) return 31;
-
-  const date = new Date(startDate);
-
-  return new Date(
-    date.getFullYear(),
-    date.getMonth() + 1,
-    0
-  ).getDate();
-}, [startDate]);
-
-const days = Array.from(
-  { length: daysInMonth },
-  (_, i) => i + 1
-);
-
-const pivotData = useMemo<PivotRow[]>(() => {
-  const map = new Map<string, PivotRow>();
-
-  data.forEach((item) => {
-    const key = item.npwpd;
-
-    if (!map.has(key)) {
-      map.set(key, {
-        npwpd: item.npwpd,
-        nama: item.nama,
-        wilayah: item.wilayah,
-        perangkat: item.perangkat,
-        status: item.status,
-        transaksiHarian: {},
+      const params = new URLSearchParams({
+        startDate,
+        endDate,
+        sortKey,
+        sortOrder,
       });
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/dashboard/objek-pajak?${params}`,
+        {
+          cache: "no-store",
+          credentials: "include",
+        }
+      );
+
+      const result = await res.json();
+      setData(result.data ?? []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-
-    const day = new Date(
-      item.trxTerakhir
-    ).getDate();
-
-    map.get(key)!.transaksiHarian[day] =
-      Number(item.total);
-  });
-
-  return Array.from(map.values());
-}, [data]);
-
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
   };
 
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  
-const endIndex = Math.min(
-  startIndex + itemsPerPage,
-  totalItems
-);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [startDate, endDate]);
 
-return (
+  useEffect(() => {
+    loadData();
+  }, [startDate, endDate, sortKey, sortOrder]);
+
+  // ── Pivot ──
+  const pivotData = useMemo<PivotRow[]>(() => {
+    const map = new Map<string, PivotRow>();
+
+    data.forEach((item) => {
+      const key = item.npwpd;
+
+      if (!map.has(key)) {
+        map.set(key, {
+          npwpd: item.npwpd,
+          nama: item.nama,
+          wilayah: item.wilayah,
+          perangkat: item.perangkat,
+          status: item.status,
+          transaksiHarian: {},
+        });
+      }
+
+      const day = new Date(item.trxTerakhir).getDate();
+      map.get(key)!.transaksiHarian[day] = Number(item.total);
+    });
+
+    return Array.from(map.values());
+  }, [data]);
+
+  // ── Search client-side ──
+  const filteredData = useMemo(() => {
+    if (!searchTerm.trim()) return pivotData;
+    const lower = searchTerm.toLowerCase();
+    return pivotData.filter(
+      (item) =>
+        item.npwpd.toLowerCase().includes(lower) ||
+        item.nama.toLowerCase().includes(lower) ||
+        item.wilayah.toLowerCase().includes(lower)
+    );
+  }, [pivotData, searchTerm]);
+
+  // ── Pagination client-side ──
+  const totalItems = filteredData.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+  const pagedData = filteredData.slice(startIndex, endIndex);
+
+  // Reset ke halaman 1 jika search / itemsPerPage berubah
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, itemsPerPage]);
+
+  // ── Hari dalam bulan ──
+  const daysInMonth = useMemo(() => {
+    if (!startDate) return 31;
+    const date = new Date(startDate);
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  }, [startDate]);
+
+  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+  return (
     <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
 
       {/* ── Toolbar ── */}
       <div className="flex flex-col gap-3 border-b border-gray-100 bg-gray-50/60 px-5 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800 dark:bg-gray-800/40">
 
-        {/* Show entries */}
         <div className="flex items-center gap-2.5">
           <span className="text-xs font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500">
             Tampilkan
           </span>
-
           <div className="relative">
             <select
-              className="h-8 appearance-none rounded-lg border border-gray-200 bg-white py-0 pl-3 pr-7 text-sm font-medium text-gray-700 shadow-sm outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:focus:border-blue-500"
+              className="h-8 appearance-none rounded-lg border border-gray-200 bg-white py-0 pl-3 pr-7 text-sm font-medium text-gray-700 shadow-sm outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
               value={itemsPerPage}
-              onChange={(e) => setItemsPerPage(Number(e.target.value))}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
             >
               {[5, 8, 10].map((value) => (
                 <option key={value} value={value} className="dark:bg-gray-800">
@@ -184,13 +175,11 @@ return (
               </svg>
             </span>
           </div>
-
           <span className="text-xs font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500">
             entri
           </span>
         </div>
 
-        {/* Search */}
         <div className="relative">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
             <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
@@ -200,9 +189,12 @@ return (
           <input
             type="text"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
             placeholder="Cari data..."
-            className="h-9 w-full rounded-lg border border-gray-200 bg-white py-0 pl-9 pr-4 text-sm text-gray-700 shadow-sm outline-none transition placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:placeholder:text-gray-500 dark:focus:border-blue-500 xl:w-[280px]"
+            className="h-9 w-full rounded-lg border border-gray-200 bg-white py-0 pl-9 pr-4 text-sm text-gray-700 shadow-sm outline-none transition placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 xl:w-[280px]"
           />
         </div>
 
@@ -211,95 +203,83 @@ return (
       {/* ── Table ── */}
       <div className="max-w-full overflow-x-auto">
         <Table>
-
           <TableHeader>
             <TableRow className="bg-gray-50 dark:bg-gray-800/60">
-
-              <TableCell
-                isHeader
-                className="whitespace-nowrap border-b border-gray-100 px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 min-w-[180px] dark:border-gray-800 dark:text-gray-400"
-              >
+              <TableCell isHeader className="whitespace-nowrap border-b border-gray-100 px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 min-w-[180px] dark:border-gray-800 dark:text-gray-400">
                 NPWPD
               </TableCell>
-
-              <TableCell
-                isHeader
-                className="whitespace-nowrap border-b border-gray-100 px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 min-w-[350px] dark:border-gray-800 dark:text-gray-400"
-              >
+              <TableCell isHeader className="whitespace-nowrap border-b border-gray-100 px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 min-w-[350px] dark:border-gray-800 dark:text-gray-400">
                 Nama Objek Pajak
               </TableCell>
-
-              <TableCell
-                isHeader
-                className="whitespace-nowrap border-b border-gray-100 px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 min-w-[180px] dark:border-gray-800 dark:text-gray-400"
-              >
+              <TableCell isHeader className="whitespace-nowrap border-b border-gray-100 px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 min-w-[180px] dark:border-gray-800 dark:text-gray-400">
                 Wilayah
               </TableCell>
-
               {days.map((day) => (
-                <TableCell
-                  key={day}
-                  isHeader
-                  className="whitespace-nowrap border-b border-gray-100 px-5 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-gray-500 min-w-[110px] dark:border-gray-800 dark:text-gray-400"
-                >
+                <TableCell key={day} isHeader className="whitespace-nowrap border-b border-gray-100 px-5 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-gray-500 min-w-[110px] dark:border-gray-800 dark:text-gray-400">
                   {day}
                 </TableCell>
               ))}
-
             </TableRow>
           </TableHeader>
 
           <TableBody>
-            {pivotData.map((item, index) => (
-              <TableRow
-                key={index}
-                className="group border-b border-gray-50 transition-colors last:border-0 hover:bg-blue-50/50 dark:border-gray-800/60 dark:hover:bg-blue-950/20"
-              >
-
-                <TableCell className="px-5 py-3.5 text-sm font-mono font-medium text-gray-600 dark:text-gray-400">
-                  {item.npwpd}
+            {loading ? (
+              <TableRow>
+                <TableCell className="px-5 py-10 text-center text-sm text-gray-400">
+                  Memuat data...
                 </TableCell>
-
-                <TableCell className="px-5 py-3.5 text-sm font-medium text-gray-800 dark:text-gray-200">
-                  {item.nama}
-                </TableCell>
-
-                <TableCell className="px-5 py-3.5">
-                  <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-                    {item.wilayah}
-                  </span>
-                </TableCell>
-
-                {days.map((day) => {
-                  const val = item.transaksiHarian[day] || 0;
-                  return (
-                    <TableCell
-                      key={day}
-                      className={`px-5 py-3.5 text-right text-sm tabular-nums transition-colors ${
-                        val > 0
-                          ? "font-medium text-gray-800 dark:text-gray-200"
-                          : "text-gray-300 dark:text-gray-700"
-                      }`}
-                    >
-                      {val > 0 ? val.toLocaleString("id-ID") : "—"}
-                    </TableCell>
-                  );
-                })}
-
               </TableRow>
-            ))}
+            ) : pagedData.length === 0 ? (
+              <TableRow>
+                <TableCell className="px-5 py-10 text-center text-sm text-gray-400">
+                  Tidak ada data ditemukan.
+                </TableCell>
+              </TableRow>
+            ) : (
+              pagedData.map((item, index) => (
+                <TableRow
+                  key={index}
+                  className="group border-b border-gray-50 transition-colors last:border-0 hover:bg-blue-50/50 dark:border-gray-800/60 dark:hover:bg-blue-950/20"
+                >
+                  <TableCell className="px-5 py-3.5 text-sm font-mono font-medium text-gray-600 dark:text-gray-400">
+                    {item.npwpd}
+                  </TableCell>
+                  <TableCell className="px-5 py-3.5 text-sm font-medium text-gray-800 dark:text-gray-200">
+                    {item.nama}
+                  </TableCell>
+                  <TableCell className="px-5 py-3.5">
+                    <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                      {item.wilayah}
+                    </span>
+                  </TableCell>
+                  {days.map((day) => {
+                    const val = item.transaksiHarian[day] || 0;
+                    return (
+                      <TableCell
+                        key={day}
+                        className={`px-5 py-3.5 text-right text-sm tabular-nums transition-colors ${
+                          val > 0
+                            ? "font-medium text-gray-800 dark:text-gray-200"
+                            : "text-gray-300 dark:text-gray-700"
+                        }`}
+                      >
+                        {val > 0 ? val.toLocaleString("id-ID") : "—"}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              ))
+            )}
           </TableBody>
-
         </Table>
       </div>
 
       {/* ── Footer ── */}
       <div className="flex flex-col items-center justify-between gap-4 border-t border-gray-100 bg-gray-50/60 px-5 py-4 xl:flex-row dark:border-gray-800 dark:bg-gray-800/40">
-
         <p className="text-sm text-gray-500 dark:text-gray-400">
           Menampilkan{" "}
           <span className="font-semibold text-gray-700 dark:text-gray-300">
-            {startIndex + 1}–{endIndex}
+            {totalItems === 0 ? 0 : startIndex + 1}–{endIndex}
           </span>{" "}
           dari{" "}
           <span className="font-semibold text-gray-700 dark:text-gray-300">
@@ -307,13 +287,11 @@ return (
           </span>{" "}
           entri
         </p>
-
         <PaginationWithIcon
           totalPages={totalPages}
           initialPage={currentPage}
           onPageChange={(page) => setCurrentPage(page)}
         />
-
       </div>
     </div>
   );
